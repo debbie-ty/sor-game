@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title>SoR Memory Game</title>
+<link rel="stylesheet" href="../sor-game/css/sor-game.css"/>
+<script src="../sor-game/js/jquery-1.11.3.min.js"></script>
+
+<style type="text/css">
+
+</style>
+
+</head>
+<body style="background: #fff0">	
+	<div class="sorGameArea memory">
+		<div class="modeBtnsDiv" id="memoryModeDiv">
+			<div class="titleDiv">				
+				<span id="titleDiv">記憶翻牌</span>
+			</div>		
+			<button class="modeBtn" onclick="startGame();">開始遊戲</button>
+		</div>
+	
+		<input type="hidden" id="score" value="" />
+		<div class="levelDiv" id="levelDiv" style="pointer-events:none;">
+			<button class="levelBtn level1">1</button>
+			<button class="levelBtn level2">2</button>
+			<button class="levelBtn level3">3</button>
+			<button class="levelBtn level4">4</button>
+			<button class="levelBtn level5">5</button>
+		</div>
+	
+		<div  id="memoryGameDiv" style="display:none;">
+			<section class="memory-game" id="memoryGame">
+					
+			</section>			
+			<div class="record">
+				<img class="logo" src="../sor-game/image/logo.png">
+				<div class="titleDiv">				
+					<span id="titleDiv">記憶翻牌</span>
+				</div>		
+				<div class="timeDiv" id="timeDiv">				
+					剩餘時間：<span id="timeCount">0</span>
+				</div>
+				<div class="scoreDiv">				
+					分數：<span id="gameScore">0</span>
+				</div>					
+				<button type="button" class="restartBtn" onclick="startGame();">重新開始</button>	
+				<img class="logo" src="../sor-game/image/andygo.png">
+			</div>	
+		</div>
+	</div>
+	
+<script>
+var zoomPercent = 1;  // Global variable
+$(document).ready(function() {	
+	$("body").css("zoom", zoomPercent);
+	init(1);	//選擇Level
+});
+
+var cards;
+var gamestart = false;
+var score = 0;
+var timeCount=0;
+var cardsQty=0;
+var gameLevel=0;
+function init(level) {
+	gameLevel= level;
+	//選擇Level按鈕
+	$('#levelDiv').find('.levelBtn').each(function(idx){		
+		$(this).removeClass("click");
+		if(gameLevel == idx+1) {
+			$(this).addClass("click");			
+		}
+	});
+	if(gamestart) {
+		var cardsHtml = "";
+		if(gameLevel >= 1) {
+			$("#memoryGame").attr("class","memory-game level1");
+			cardsQty =6; //3*2
+			cardsHtml = '<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +					
+						'<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' ;
+		} 
+		if (gameLevel >= 2) {
+			$("#memoryGame").attr("class","memory-game level2");
+			cardsQty =12; //4*3
+			cardsHtml += '<div class="memory-card" data-framework="card_04">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_04.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_04">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_04.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_05">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_05.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +					
+						'<div class="memory-card" data-framework="card_05">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_05.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +					
+						'<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' ;
+		} 
+		if (gameLevel >= 3) {	
+			$("#memoryGame").attr("class","memory-game level3");
+			cardsQty =20; //5*4
+			cardsHtml += '<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' + 						
+						'<div class="memory-card" data-framework="card_04">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_04.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_04">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_04.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' + 						
+						'<div class="memory-card" data-framework="card_04">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_04.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_04">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_04.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>';
+		} 
+		if (gameLevel >= 4) {	
+			$("#memoryGame").attr("class","memory-game level4");
+			cardsQty =24; //6*4
+			cardsHtml += 
+						'<div class="memory-card" data-framework="card_05">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_05.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +	 
+						'<div class="memory-card" data-framework="card_05">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_05.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' ;
+		} 
+		if (gameLevel >= 5) {
+			$("#memoryGame").attr("class","memory-game level5");
+			cardsQty =28; //7*4
+			cardsHtml += 
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' + 
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>';
+		}
+		console.log("LEVEL" + level);
+		$("#memoryGame").html(cardsHtml);		
+		cards = document.querySelectorAll('.memory-card');
+		cards.forEach(card => card.addEventListener('click', flipCard));
+		lockBoard = true;
+		setTimeout(() => {
+			cards.forEach(card => {
+			    let randomPos = Math.floor(Math.random() * cardsQty);
+			    card.style.order = randomPos;
+			    card.classList.add('flip');	//翻開全部		    
+			});
+		}, 500);
+		setOpenCardTime(5)
+		setTimeout(() => {
+			cards.forEach(card => {
+				card.classList.remove('flip');			
+			});			
+			lockBoard = false;
+		}, 6000);
+	} else {		
+		var cardsHtml = "";
+		$("#memoryGame").attr("class","memory-game level1");
+		cardsQty =6; //3*2
+		cardsHtml = '<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +					
+						'<div class="memory-card" data-framework="card_01">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_01.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_02">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_02.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' +
+						'<div class="memory-card" data-framework="card_03">'+						 
+							'<img class="front-face" src="../sor-game/image/memory/card_03.png"/>' +
+							'<img class="back-face" src="../sor-game/image/memory/card_back.png"/>' +
+						'</div>' ;
+		$("#memoryGame").html(cardsHtml);
+	}
+}
+
+
+/*隨機配牌*/
+function startGame() {
+	$("#memoryModeDiv").hide();	//隱藏模式選單
+	$("#memoryGameDiv").show();	//顯示遊戲畫面	
+	gamestart = true;
+	// Reset score
+	score = 0;
+	timeCount=0;
+	gameLevel =1;
+	//分數
+	$("score").val(score);
+	$("#gameScore").text(score);    
+	//設時間倒數3分鐘
+	$("#timeCount").text(timeCount);
+			
+	$("#startBtn").hide();
+	setTimeCount(180);
+	init(gameLevel);		
+};
+
+
+function setTimeCount(sec) {	
+	timeCount = sec;	
+	var downloadTimer = setInterval(function(){		
+		timeCount -= 1;
+		$("#timeCount").html(timeCount);
+		if(timeCount <= 0){			
+			//倒數時間到
+			//disable flip			
+			cards.forEach(card => card.removeEventListener('click', flipCard));
+			clearInterval(downloadTimer);
+			$("#startBtn").show();
+			setTimeout("",1000);
+			gamestart = false;
+		} else if (cardsQty == 0) {
+			//時間內所有牌全部翻開			
+    	    if (gameLevel==5) {
+    	    	//時間內翻完Level 5
+    	    	clearInterval(downloadTimer);			
+    			score = score + timeCount;
+    			$("#score").val(score);
+        	    $("#gameScore").text(score);
+    			$("#startBtn").show();
+    			gamestart = false;	
+    	    } else {
+    	    	gameLevel++;
+    	    	init(gameLevel);
+    	    }    	    
+		}
+	}, 1000);		
+}
+
+//倒數牌翻開的時間
+function setOpenCardTime(sec) {	
+	var downloadTimer = setInterval(function(){
+		if(sec <= 0){
+			clearInterval(downloadTimer);			
+		} else {			
+			sec -= 1;
+		}				
+	}, 1000);	
+}
+
+let hasFlippedCard = false;
+let firstCard, secondCard;
+let lockBoard = false;
+//點擊翻牌
+function flipCard() {
+	if (lockBoard) {
+		return;
+	}
+	if (this === firstCard) {
+		return;
+	}
+	this.classList.add('flip');	//翻開排
+	if (!hasFlippedCard) {
+		//開第一張牌
+		hasFlippedCard = true;
+		firstCard = this;
+		return;
+	}	
+	secondCard = this;
+	checkForMatch();
+}
+function checkForMatch() {
+	if (firstCard.dataset.framework === secondCard.dataset.framework) {
+		score = score + 10;
+		$("#score").val(score);
+		$("#gameScore").text(score);
+		//兩張牌一樣，固定翻開兩張牌		
+		disableCards();
+		return;
+	}
+	//兩張牌不一樣翻回去
+	unflipCards();	
+}
+//兩張牌一樣
+function disableCards() {
+	lockBoard = true;	
+	setTimeout(() => {
+		firstCard.removeEventListener('click', flipCard);
+		secondCard.removeEventListener('click', flipCard);	
+		cardsQty = cardsQty-2;		
+		resetBoard();
+	}, 200);
+		
+}
+function unflipCards() {
+	lockBoard = true;	
+	setTimeout(() => {
+		firstCard.classList.remove('flip');
+		secondCard.classList.remove('flip');
+		resetBoard();
+	}, 1000);	
+}
+function resetBoard() {
+	[hasFlippedCard, lockBoard] = [false, false];
+	[firstCard, secondCard] = [null, null];
+}
+
+
+
+
+</script>
+</body>
+</html>
+

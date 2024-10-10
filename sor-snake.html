@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title>SoR Snake Game</title>
+<link rel="stylesheet" href="../sor-game/css/sor-game.css"/>
+<script src="../sor-game/js/jquery-1.11.3.min.js"></script>
+
+<style type="text/css">
+
+</style>
+
+</head>
+<body style="background: #fff0" >	
+	<div class="sorGameArea snake">		
+		<input type="hidden" id="score" value="" />	
+		<div class="modeBtnsDiv" id="snakeModeDiv">
+			<div class="titleDiv">				
+				<span id="titleDiv">PA貪食蛇</span>
+			</div>		
+			<button class="modeBtn" onclick="startGame();">開始遊戲</button>
+		</div>	
+		<!-- 寶石圖案 -->
+		<div style="display:none;">
+			<img id="img_0" src="../sor-game/image/snake/icon_01.png"/>
+			<img id="img_1" src="../sor-game/image/snake/icon_02.png"/>
+			<img id="img_2" src="../sor-game/image/snake/icon_03.png"/>
+			<img id="img_3" src="../sor-game/image/snake/icon_04.png"/>
+			<img id="img_4" src="../sor-game/image/snake/icon_05.png"/>
+			<img id="img_head" src="../sor-game/image/snake/head.png"/>
+			<img id="img_body" src="../sor-game/image/snake/body.png"/>
+		</div>
+		<div class = "snakeGameDiv" id="snakeGameDiv" style="display:none;">
+			<canvas id="snakeGameArea" width="600" height="600" class="snakeArea"></canvas>	
+			<div class="record">
+				<img class="logo" src="../sor-game/image/logo.png">
+				<div class="titleDiv">				
+					<span id="titleDiv">PA貪食蛇</span>
+				</div>		
+				<div class="scoreDiv">				
+					分數：<span id="gameScore">0</span>
+				</div>					
+				<div id="directionDiv" class="directionDiv" style="pointer-events:none;">
+					<button class="btn upBtn" onclick="change_direction_click('up');">⬆</button>			
+					<button class="btn leftBtn" onclick="change_direction_click('left');">⬅</button>
+					<button class="btn downBtn" onclick="change_direction_click('down');">⬇</button>								
+					<button class="btn rightBtn" onclick="change_direction_click('right');">⮕</button>
+				</div>
+				<button type="button" class="restartBtn" onclick="startGame();">重新開始</button>	
+				<img class="logo" src="../sor-game/image/andygo.png">
+			</div>	
+		</div>	
+	</div>
+	
+<script>
+
+var zoomPercent = 1;  // Global variable
+$(document).ready(function() {	
+	$("body").css("zoom", zoomPercent);	
+});
+
+//Score
+var score = 0;
+var gameStart = false;
+var gameover = false;
+var stoneCatch={};	//遊戲中吃到香菇或星星紀錄
+var speed=0;
+function startGame() {
+	$("#snakeModeDiv").hide();	//隱藏模式選單
+	$("#snakeGameDiv").show();	//顯示遊戲畫面	
+	// Reset score
+	gameStart = true;
+    score = 0;
+    speed=500;
+    stoneCatch["food"] = 0;
+    stoneCatch["star"] = 0;
+    $("#score").val(score);
+    $("#gameScore").text(score);
+    snake = [  {x: 150, y: 150},{x: 120, y: 150}];	//蛇的座標    
+  	//Horizontal velocity
+    dx = 30;
+    // Vertical velocity
+    dy = 0;
+    qIdx = 0;
+ 	// Reset game over
+    gameover = false;    
+    if(gameStart) {
+		$("#startBtn").hide();
+		$("#directionDiv").css("pointer-events","all");
+		gen_stone();
+		mainFunction();
+    }   
+}
+
+
+function mainFunction() {	
+	if (gameover) {
+		$("#startBtn").show();	
+		$("#directionDiv").css("pointer-events","none");
+        context.fillStyle = "transparent";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        
+        context.fillStyle = "#ffffff";
+        context.font = "48px Verdana";
+        drawCenterText("Game Over!", 0, 0 + canvas.height / 2 + 10, canvas.width);    
+		return;
+	}
+	changing_direction = false;
+	setTimeout(function onTick() {
+		clearCanvas();
+		has_game_ended()
+		drawStone();
+		moveSnake();
+		drawSnake();
+        // Call mainFunction again
+        mainFunction();
+	}, speed)
+}
+
+var canvas = document.getElementById("snakeGameArea");
+var context = canvas.getContext("2d");
+
+let snake = [  {x: 200, y: 200},{x: 170, y: 200}];	//蛇的座標
+
+let changing_direction = false;	//改變方向
+let stone_x;
+let stone_y;
+//Horizontal velocity
+let dx = 30;
+// Vertical velocity
+let dy = 0;
+
+document.addEventListener("keydown", change_direction);
+
+//填白畫布
+function clearCanvas() {	
+	context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+//迴圈把蛇的座標接出來
+function drawSnake()  {  
+	var img = "";	
+	for(var i=0 ; i<snake.length; i++) {
+		var snakePart = snake[i];
+		if(i == 0) {
+			img = document.getElementById("img_head" )	
+		} else {
+			img = document.getElementById("img_body" )
+		}		
+		context.fillStyle = '#fff0';	
+		context.fillRect(snakePart.x, snakePart.y, 30, 30);
+		context.drawImage(img, snakePart.x, snakePart.y, 30, 30);
+	}	
+}
+
+//畫寶石
+function drawStone() {
+	var img = document.getElementById("img_" + imgId );
+	context.fillStyle = '#fff0';
+	context.fillRect(stone_x, stone_y, 30, 30);
+	context.drawImage(img, stone_x, stone_y, 30, 30);	
+}
+
+function moveSnake() {
+	const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+	const has_eaten_stone = snake[0].x === stone_x && snake[0].y === stone_y;
+	snake.unshift(head);
+	if (has_eaten_stone) {
+		score = score+20;
+		stoneCatch["food"] = parseInt(stoneCatch["food"]) +1;
+		//每100分速度加快一級
+		if(speed > 100 && score%100 == 0) {
+			speed=speed-100;
+		}
+		// 吃掉一個寶石，再建立一個新的，身體長長一塊		
+		gen_stone();		
+		$("#score").val(score);
+	    $("#gameScore").text(score);
+	} else {
+		// 移動中移除最後一個方塊
+		snake.pop();
+	}
+}
+function change_direction_click(type) {
+	var e = document.createEvent("UIEvents");
+	e.initUIEvent("keypress", true, true, window, 1);	
+	if(type=="up") {
+		e.keyCode = 38;		
+	} else if (type == "down") {
+		e.keyCode =	40;
+	} else if (type == "left") {
+		e.keyCode =	37;
+	} else if (type == "right") {
+		e.keyCode =	39;
+	}
+	change_direction(e);
+}
+
+//控制方向鍵
+function change_direction(event) {
+	const LEFT_KEY = 37;
+	const RIGHT_KEY = 39;
+	const UP_KEY = 38;
+	const DOWN_KEY = 40;
+ 
+	if (changing_direction) {
+		return;
+	}
+    changing_direction = true;
+	const keyPressed = event.keyCode;
+	const goingUp = dy === -30;
+	const goingDown = dy === 30;
+	const goingRight = dx === 30;  
+	const goingLeft = dx === -30;
+ 
+     if (keyPressed === LEFT_KEY && !goingRight) {    
+          dx = -30;
+          dy = 0;  
+     }
+ 
+     if (keyPressed === UP_KEY && !goingDown) {    
+          dx = 0;
+          dy = -30;
+     }
+ 
+     if (keyPressed === RIGHT_KEY && !goingLeft) {    
+          dx = 30;
+          dy = 0;
+     }
+ 
+     if (keyPressed === DOWN_KEY && !goingUp) {    
+          dx = 0;
+          dy = 30;
+     }
+}
+
+function has_game_ended() {    
+	for (let i = 2; i < snake.length; i++) {
+        if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
+        	gameover = true;
+        }
+	}
+    const hitLeftWall = snake[0].x < 0;
+    const hitRightWall = snake[0].x > canvas.width - 30;
+    const hitTopWall = snake[0].y < 0;
+    const hitBottomWall = snake[0].y > canvas.height - 30;
+    /*
+    console.log("hitLeftWall" + hitLeftWall)
+    console.log("hitRightWall" + hitRightWall)
+    console.log("hitTopWall" + hitTopWall)
+    console.log("hitBottomWall" + hitBottomWall)
+    */
+    if(hitLeftWall || hitRightWall || hitTopWall || hitBottomWall) {
+    	gameover = true;
+    }
+    return gameover;
+}
+
+function random_stone(min, max) {  
+   return Math.round((Math.random() * (max-min) + min) / 30) * 30;
+}
+
+var imgId;
+function gen_stone() {
+	imgId = Math.floor(Math.random() * 5);	
+   	stone_x = random_stone(0, canvas.width - 30);
+   	stone_y = random_stone(0, canvas.height - 30);
+   	snake.forEach(function has_snake_eaten_stone(part) {
+        const has_eaten = part.x == stone_x && part.y == stone_y;
+        if (has_eaten) gen_stone();
+      });
+}
+</script>
+</body>
+</html>
+

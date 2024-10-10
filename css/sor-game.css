@@ -1,0 +1,269 @@
+@charset "utf-8";
+
+.sorGameArea {
+	width: 1280px;
+    height: 720px;
+    position: relative;
+}
+
+.sorGameArea.diamond,
+.sorGameArea.memory,
+.sorGameArea.snake {
+	background: transparent url(../image/diamond/background_diamond.png) no-repeat;    
+    background-size: cover;
+}
+
+.sorGameArea.diamond .modeBtnsDiv,
+.sorGameArea.memory .modeBtnsDiv,
+.sorGameArea.snake .modeBtnsDiv {
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;	
+}
+
+.sorGameArea.diamond .modeBtnsDiv .titleDiv, 
+.sorGameArea.memory .modeBtnsDiv .titleDiv,
+.sorGameArea.snake .modeBtnsDiv .titleDiv{
+  font-size: 36px;
+  padding: 20px;
+}
+
+.sorGameArea.diamond .modeBtnsDiv .modeBtn,
+.sorGameArea.memory .modeBtnsDiv .modeBtn,
+.sorGameArea.snake .modeBtnsDiv .modeBtn {
+    width: 345px;
+    height: 100px;
+    margin: 0px 15px;
+    border: 0px;
+    font-size: 50px;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: #5f78dc89;
+}
+
+.sorGameArea.diamond .modeBtnsDiv .modeBtn:hover, 
+.sorGameArea.diamond .diamondGameDiv .record .restartBtn:hover,
+.sorGameArea.memory .modeBtnsDiv .modeBtn:hover, 
+.sorGameArea.memory .record .restartBtn:hover,
+.sorGameArea.snake .modeBtnsDiv .modeBtn:hover, 
+.sorGameArea.snake .snakeGameDiv .record .restartBtn:hover {
+    background-color: #4daa8889;
+    color: white;
+  }
+
+
+  .sorGameArea.diamond .diamondGameDiv {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    text-align: center;	
+    display: flex;
+  }
+
+  .sorGameArea.diamond .diamondGameDiv .diamondGame {
+    width: 80%;
+    
+  }
+
+  .sorGameArea.diamond .diamondGameDiv .record {
+    width: 20%;
+    display: flex;
+    flex-direction: column;      
+    background-color: #fff0;
+  }
+
+  .sorGameArea.diamond .diamondGameDiv .record .titleDiv,
+  .sorGameArea.memory .record .titleDiv,
+  .sorGameArea.snake .snakeGameDiv .record .titleDiv{
+    padding: 10px;
+    margin: 20px 30px;
+    font-size: 30px;
+    border-radius: 15px;
+    background: #f6bcbc;
+    text-align: center
+  }
+
+  .sorGameArea.diamond .diamondGameDiv .record .timeDiv,
+  .sorGameArea.memory .record .timeDiv,
+  .sorGameArea.snake .snakeGameDiv .record .timeDiv {
+    padding: 10px;
+    margin: 20px 30px;
+    font-size: 20px;
+  }
+
+  .sorGameArea.diamond .diamondGameDiv .record .scoreDiv,
+  .sorGameArea.memory .record .scoreDiv,
+  .sorGameArea.snake .snakeGameDiv .record .scoreDiv {
+    padding: 10px;
+    margin: 20px 30px;
+    font-size: 20px;
+  }
+
+  .sorGameArea.diamond .diamondGameDiv .record .restartBtn,
+  .sorGameArea.memory .record .restartBtn,
+  .sorGameArea.snake .snakeGameDiv .record .restartBtn {
+    margin: 35px;
+    border: 0px;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: #5f78dc89;
+  }
+
+  .sorGameArea.memory .levelDiv{
+    padding: 10px;
+  }
+  .sorGameArea.memory .levelDiv .levelBtn{
+    width: 50px;
+    height: 50px;
+    margin: 0px 15px;
+    border: 0;
+    border-radius: 100%;
+    background-color: #b3da1a;
+    font-size: 30px;
+  }
+
+  .sorGameArea.memory .levelDiv .levelBtn.click{
+	background-color: #aab0e7;
+  }
+
+  .sorGameArea.memory .memory-game {
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;    
+  }
+
+  .sorGameArea.memory .record {
+    width: 18%;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0);
+    position: absolute;
+    left: 1000px;
+    top: 0;
+  }
+
+  .sorGameArea.memory .memory-game.level1{
+	width: 390px;
+    height: 320px;
+    top: 260px;
+    left: 308px;	
+  }
+  .sorGameArea.memory .memory-game.level2{
+	width: 520px;
+    height: 480px;
+    top: 150px;
+    left: 243px;	
+  }
+  .sorGameArea.memory .memory-game.level3{
+	width: 650px;
+    height: 640px;
+    left: 178px;	
+  }
+  .sorGameArea.memory .memory-game.level4{
+	width: 780px;
+    height: 640px;
+    left: 113px;	
+  }
+  .sorGameArea.memory .memory-game.level5{
+	width: 910px;
+    height: 640px;
+    left: 48px;	
+  }
+
+
+  .sorGameArea.memory .memory-game  .memory-card {
+	width: 120px;
+	height: 150px;
+	margin: 5px;
+	position: relative;
+	transform: scale(1);
+	transform-style: preserve-3d;
+	transition: transform .5s;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.3);
+}
+  .sorGameArea.memory .memory-game  .memory-card:active {
+  transform: scale(0.97);
+  transition: transform .2s;
+}
+
+  .sorGameArea.memory .memory-game  .memory-card.flip {
+  transform: rotateY(180deg);
+}
+
+.front-face, .back-face {
+	width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 5px;
+    background: transparent;
+    border: 0;
+    backface-visibility: hidden;
+}
+.front-face {
+  transform: rotateY(180deg);
+}
+
+.sorGameArea.snake .snakeGameDiv {
+  
+
+}
+
+.sorGameArea.snake .snakeGameDiv .snakeArea {
+  display: flex;
+  flex-wrap: wrap;
+  position: absolute;
+  background-color: #1e1b1b61;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sorGameArea.snake .snakeGameDiv .record {
+  width: 20%;
+  display: flex;
+  flex-direction: column;      
+  background-color: #fff0;
+}
+
+.sorGameArea.snake .snakeGameDiv .record .directionDiv {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(2, auto);
+  justify-content: center;
+  align-items: center;
+}   
+.sorGameArea.snake .snakeGameDiv .record .directionDiv .btn {
+  padding: 10px;
+}
+
+.sorGameArea.snake .snakeGameDiv .record .directionDiv .upBtn {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.sorGameArea.snake .snakeGameDiv .record .directionDiv .downBtn {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.sorGameArea.snake .snakeGameDiv .record .directionDiv .leftBtn {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.sorGameArea.snake .snakeGameDiv .record .directionDiv .rightBtn {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.sorGameArea.snake .snakeGameDiv .record .logo {
+  width: 90%;
+  
+}
