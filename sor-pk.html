@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title>英語44音 PK賽</title>
+<link rel="stylesheet" href="../sor-game/css/sor-game.css"/>
+<script src="../sor-game/js/jquery-1.11.3.min.js"></script>
+
+<style type="text/css">
+
+</style>
+
+</head>
+<body style="background: #fff0" >	 
+	<div class="sorGameArea pk">	
+		<input type="hidden" id="currentQ" value="" />
+		<div class="modeBtnsDiv" id="pkModeDiv">
+			<div class="titleDiv">				
+				<span id="titleDiv">英語44音 PK賽</span>
+			</div>		
+			<button class="modeBtn" onclick="initPkGame();">開始遊戲</button>
+		</div>	
+		<img style="display:none;" class="loadingImg" src="../sor-game/image/pk/loading.png"/>		 		
+		<div class="pkGameDiv" id="pkGameDiv" style="display:none;">
+			<div class="timeDiv">
+				<span id="countdown" ></span>
+			</div>
+			<div class="answerAreaDiv">
+				<!-- 題目區塊 -->
+				<div id="questionText" class="questionDiv">										
+				</div>
+				<!-- 選項區塊 -->		
+				<div id="optionDiv" class="optionDiv">				
+				</div>
+				<div id="userDiv" class="userSelectDiv">
+					<span id="userPoint"></span>
+					<div id="userResult" class="result" style="display:none;"></div>
+				</div>
+				<div id="npcDiv" class="userSelectDiv" style="right:0;">
+					<div id="thinkingDiv" class="thinkingDiv">思考中..</div>
+					<span id="npcPoint"></span>
+					<div id="npcResult" class="result" style="display:none;right: auto;"></div>
+				</div>
+			</div>	
+			<div class="user"> 
+				<div id="userName"></div>
+				<div id="spScore">0</div>
+			</div>		
+			<div class="npc"> 
+				<div id="npcName"></div>
+				<div id="spNpcScore">0</div>
+			</div>
+		</div>
+	</div>
+<script>
+var dataJson;
+var npcAns ;
+var npcExSec ;
+var countdownnumber=5;
+var qIdx = 0;	
+var qCount=5;	//題數
+var decideTime=0;
+var allow = false;
+
+var firePoint = 0;
+var ansPoint = 0;
+var correctAns ='';
+var userAns = '';	//user選項
+var startTime;
+var endTime;
+var score = 0;
+var npcScore = 0;
+var step=0;
+var waitTime =1.0;
+var correct;
+var ansArr = [];
+var scoreAry = [];
+var npcScoreAry = [];
+
+
+var zoomPercent = 1;  // Global variable
+$(document).ready(function() {	
+	$("body").css("zoom", zoomPercent);	
+});
+
+function initPkGame() {	
+	$("#pkModeDiv").hide();
+	$('.loadingImg').show();
+	$("#pkGameDiv").hide();
+
+	dataJson = JSON.parse("{\"gameId\":1,\"npcData\":{\"npcAnsAry\":[\"A\",\"A\",\"B\",\"B\",\"C\"],\"npcExSec\":[10,11,9,5,7],\"npcUserName\":\"麻煩人\"},\"questionList\":[{\"questionId\":1,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"A\"},{\"questionId\":2,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"B\"},{\"questionId\":3,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"C\"},{\"questionId\":4,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"A\"},{\"questionId\":5,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"B\"}],\"userName\":\"安迪哥\"}");
+	startGame();
+	//setTimeout("startGame();",1000);		
+}
+function startGame() {	
+	$('.loadingImg').hide();
+	$("#pkGameDiv").show();
+	//NPC的答案
+	npcAns = dataJson.npcData.npcAnsAry;
+	//NPC答題秒數
+	npcExSec = dataJson.npcData.npcExSec;
+	$("#userName").html(dataJson.userName);
+	$("#npcName").html(dataJson.npcData.npcUserName);
+	qIdx=0;
+	ansArr = [];
+	score = 0;
+	scoreAry=[];
+	$("#spScore").text(score);
+	npcScore = 0;
+	npcScoreAry = [];
+	$("#spNpcScore").text(npcScore);
+	step=0;
+	$('#questionText').html('<div class="qIndexDiv">第' + (qIdx+1) + '題</div>' );	
+	$("#optionDiv").html("");
+	$("#countdown").html("");
+	setTimeout("goQuestion(qIdx);",1500);
+}
+
+function goQuestion(qIdx) {
+	$("#npcPoint").text("");	
+	$("#thinkingDiv").show();
+	startTime = new Date();	
+	userAns = '';
+	firePoint = 0;
+	ansPoint = 0;
+	allow = true;
+	decideTime = npcExSec[qIdx];	//NPC答題秒數
+	$('#currentQ').val(qIdx);
+	/*組題目DIV*/
+	var question_obj = dataJson.questionList[qIdx];		
+	$("#questionText").text(question_obj.topic);
+	correctAns = question_obj.answer;
+	q_startTime = new Date();
+	
+	var button_option = '<div id="userSelectIcon" class="userSelectIcon" style="display:none;"><image src="../sor-game/image/pk/choice.png"/></div>' + 
+						'<div id="npcSelectIcon" class="npcSelectIcon" style="display:none;"><image src="../sor-game/image/pk/choice.png"/></div>';
+	button_option += '<div class="selectDiv"><button type="button" class="optionBtn" style="background-image: url(../sor-game/image/pk/q_'+ qIdx +'_1.png);" id="option_A_btn" onclick="selectAnswer(this,\'2\');" ans="A"></button></div>'+
+					 '<div class="selectDiv"><button type="button" class="optionBtn" style="background-image: url(../sor-game/image/pk/q_'+ qIdx +'_2.png);" id="option_B_btn" onclick="selectAnswer(this,\'2\');" ans="B"></button></div>'+
+					 '<div class="selectDiv"><button type="button" class="optionBtn" style="background-image: url(../sor-game/image/pk/q_'+ qIdx +'_3.png);" id="option_C_btn" onclick="selectAnswer(this,\'2\');" ans="C"></button></div>'+
+					 '<div class="selectDiv"><button type="button" class="optionBtn" style="background-image: url(../sor-game/image/pk/q_'+ qIdx +'_4.png);" id="option_D_btn" onclick="selectAnswer(this,\'2\');" ans="D"></button></div>';
+	$("#optionDiv").html(button_option);
+	
+	countdownnumber = 15;
+	timerGo();
+}
+function timerGo(){
+	x=document.getElementById("countdown");
+	x.innerHTML=countdownnumber;
+	countdownnumber--;
+	countdownid=window.setInterval(countdownfunc,1000);
+}
+function countdownfunc(){ 
+	var reset = false;
+	x.innerHTML=countdownnumber;
+	  
+	//NPC已達提
+	if(countdownnumber == npcExSec[qIdx]) {
+		$("#npcPoint").text("已答題");
+		$("#thinkingDiv").hide();
+	}
+	if(countdownnumber <= firePoint){		
+		result();
+	}	  
+	if(!reset)
+		countdownnumber--;
+}
+
+function selectAnswer(obj, qType){
+	if(!allow || userAns != ''){
+		return;
+	}
+    userAns = $(obj).attr("ans");    
+    endTime = new Date();    
+    $("#userSelectIcon").show();    
+    $("#userSelectIcon").addClass(userAns);
+    
+    ansPoint = countdownnumber;	// user的剩餘秒數
+	firePoint = ansPoint;		// NPC的剩餘秒數
+	if(npcExSec[qIdx] < ansPoint) {
+		firePoint = npcExSec[qIdx];
+	}		
+}
+function result() {
+	if(!allow)
+		return;
+	$('#npcPoint').text("");
+	clearInterval(countdownid);
+	allow = false;
+	ansCheck();
+	record();
+}
+function ansCheck() {
+	//判斷USER的答題結果
+	$("#userResult").show();
+	
+	if(correctAns == userAns) {
+		$("#userResult").text("答對啦");
+		$("#userResult").css('background', '\#4CAF50');
+		correct = 'Y';		
+		var tmpScore = 1;
+		if(ansPoint>=13 && ansPoint<=15) {
+			tmpScore = 20;
+		} else if(ansPoint>=11 && ansPoint<=15) {
+			tmpScore = 15;
+		} else if(ansPoint>=8 && ansPoint<=10) {
+			tmpScore = 10;
+		} else if(ansPoint>=5 && ansPoint<=7) {
+			tmpScore = 5;
+		} else if(ansPoint>=1 && ansPoint<=4) {
+			tmpScore = 1;
+		}
+		scoreAry[qIdx] = tmpScore;
+		$("#userPoint").text("+" + tmpScore + "分!");
+		score += tmpScore;
+		$("#spScore").text(score);		
+    } else {
+    	scoreAry[qIdx] = 0;
+    	if(userAns != "") { 
+    		$("#userResult").text("答錯了");	
+    	} else {
+    		$("#userResult").text("未作答");
+    	}
+    	
+    	$("#userResult").css('background', '\#ff000052');
+    	
+    	correct = 'N';
+    }
+	if(userAns == ''){		
+		endTime = new Date();
+	}
+	
+	//判斷NPC的答題結果
+	if(npcAns[qIdx] != "") {
+		$("#npcSelectIcon").show();
+		$("#npcSelectIcon").addClass(npcAns[qIdx]);	
+	}
+	
+	$("#npcResult").show();
+	if(npcAns[qIdx] == correctAns){		
+		$("#npcResult").text("答對啦");
+		$("#npcResult").css('background', '\#4CAF50');
+		var tmpScore = 1;
+		if(npcExSec[qIdx]>=13 && npcExSec[qIdx]<=15) {
+			tmpScore = 20;
+		} else if(npcExSec[qIdx]>=11 && npcExSec[qIdx]<=15) {
+			tmpScore = 15;
+		} else if(npcExSec[qIdx]>=8 && npcExSec[qIdx]<=10) {
+			tmpScore = 10;
+		} else if(npcExSec[qIdx]>=5 && npcExSec[qIdx]<=7) {
+			tmpScore = 5;
+		} else if(npcExSec[qIdx]>=1 && npcExSec[qIdx]<=4) {
+			tmpScore = 1;
+		}
+		npcScoreAry[qIdx] = tmpScore;
+		$("#npcPoint").text("+" + tmpScore + "分!");
+		npcScore += tmpScore;
+		$("#spNpcScore").text(npcScore);
+	} else {		
+		npcScoreAry[qIdx] = 0;
+		if(npcAns[qIdx] != "") {
+			$("#npcResult").text("答錯了");	
+		} else {
+			$("#npcResult").text("未作答");
+		}
+		
+		$("#npcResult").css('background', '\#ff000052');
+	}
+	
+	//標示正確答案
+	$('#option_'+ correctAns +'_btn').addClass( "correct" );			
+	step =1;
+	waitTime =3;
+	waitTimer();	
+}
+
+function waitTimer(){
+	waitTime = waitTime-1;
+	countdownid = window.setInterval(waitFunc,1000);
+}
+
+function waitFunc(){ 
+	var reset = false;
+	if (waitTime==0){
+		clearInterval(countdownid);
+		if(step==2){
+			if(qIdx == (qCount-1)){
+				var pkResult="0";
+				var saveScore=0;
+				if(score > npcScore ) {
+					//獲勝者可以贏得分數
+					pkResult="1";
+					saveScore=score;
+				} else if (score < npcScore ) {
+					pkResult="2";
+					saveScore=0;
+				} else if (score == npcScore ) {
+					//雙方可以獲得20 分的分數獎勵
+					pkResult="0";
+					saveScore=20;
+				}
+				finishGame(saveScore);			
+				return;
+		    }
+			qIdx++;
+			$("#countdown").html("");
+			$("#optionDiv").html("");
+			$('#questionText').html('<div class="qIndexDiv">第' + (qIdx+1) + '題</div>' );
+			setTimeout("goQuestion(qIdx);",1500);
+		} else{
+			clearQuestionArea();
+		}		
+	}	  
+	if(!reset){
+		waitTime = waitTime-1;
+	}		
+}
+
+
+function clearQuestionArea(){
+	$("#userPoint").text("");
+	$("#npcPoint").text("");	
+	$("#userResult").hide();
+	$("#npcResult").hide();
+	step=2;
+	waitTime =2;
+	waitTimer();
+}
+function record(){
+	if(endTime < startTime)
+		endTime = new Date();
+	
+	var answer = {};
+	answer["gameId"] = dataJson.gameId;	
+	answer["qId"] = dataJson.questionList[qIdx].question_id;	
+	answer["exSec"] = ansPoint;
+	answer["ans"] = userAns;
+	answer["correct"] = correct;
+	ansArr.push(answer);	
+}
+
+function finishGame(saveScore){
+	alert("遊戲結束")
+}
+
+
+
+</script>
+</body>
+</html>
+
