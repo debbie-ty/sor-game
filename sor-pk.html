@@ -89,8 +89,8 @@ function initPkGame() {
 	$("#pkGameDiv").hide();
 
 	dataJson = JSON.parse("{\"gameId\":1,\"npcData\":{\"npcAnsAry\":[\"A\",\"A\",\"B\",\"B\",\"C\"],\"npcExSec\":[10,11,9,5,7],\"npcUserName\":\"麻煩人\"},\"questionList\":[{\"questionId\":1,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"A\"},{\"questionId\":2,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"B\"},{\"questionId\":3,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"C\"},{\"questionId\":4,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"A\"},{\"questionId\":5,\"topic\":\"請在下列選出與題目聲音對應的符號：\",\"answer\":\"B\"}],\"userName\":\"安迪哥\"}");
-	startGame();
-	//setTimeout("startGame();",1000);		
+	//startGame();
+	setTimeout("startGame();",1000);		
 }
 function startGame() {	
 	$('.loadingImg').hide();
