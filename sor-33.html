@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title>SoR Memory Game</title>
+<link rel="stylesheet" href="../sor-game/css/sor-game.css"/>
+<script src="../sor-game/js/jquery-1.11.3.min.js"></script>
+
+<style type="text/css">
+	table {
+		
+	}
+	th{
+		font-size:32px;
+	}
+	td {
+		padding: 12px;
+	}
+	img {
+		width: 80px;
+	}
+	button {
+		border: 0px;
+    padding: 10px 30px;
+    border-radius: 12px;
+    font-size: 24px;
+    cursor: pointer;
+    background-color: #5f78dc89;
+    margin: 40px 250px;
+	}
+
+</style>
+
+</head>
+<body style="background: #fff0" >	
+	<div>
+		<button onclick="startGame();">33暖舌操</button>
+		<section id="threeTable">	
+			
+		</section>			
+	</div>
+	
+<script>
+
+$(document).ready(function() {	
+	startGame() 
+});
+
+function startGame() {
+	var cardsHtml = "<table>";
+	for(var i=0 ;i<4 ; i++) {
+		cardsHtml = cardsHtml + "<tr>";
+		for(var j=0 ;j<6 ; j++) {
+			if(i==0) {
+				var sn = j+1;
+				cardsHtml = cardsHtml + "<th>"+sn+"</th>";
+			} else {
+				let randomNum = Math.random() < 0.5 ? 1 : 2;
+				var imageName = "andy-"+randomNum+".png"
+				cardsHtml = cardsHtml + "<td><img src='../sor-game/image/33/"+ imageName +"'/></td>";
+			}
+		
+		}
+		cardsHtml = cardsHtml + "</tr>";
+	}
+
+
+
+	cardsHtml = cardsHtml + "</table>";
+	$("#threeTable").html(cardsHtml);		
+}
+
+
+</script>
+</body>
+</html>
+
