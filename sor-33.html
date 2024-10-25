@@ -8,7 +8,7 @@
 
 <style type="text/css">
 	table {
-		
+		margin: 0px 20px 50px 20px;
 	}
 	th{
 		font-size:32px;
@@ -28,15 +28,27 @@
     background-color: #5f78dc89;
     margin: 40px 250px;
 	}
+	div{
+		margin: 20px;
+		font-size: 32px;
+	}
 
 </style>
 
 </head>
 <body style="background: #fff0" >	
 	<div>
-		<button onclick="startGame();">33暖舌操</button>
-		<section id="threeTable">	
-			
+		<button onclick="startGame();">Random</button>
+		<div>吐捲舌練習</div>
+		<section id="threeTable">		
+		</section>			
+		<button onclick="startGame();">Random</button>
+		<div>吐捲五言詩</div>
+		<section id="fiveTable">	
+		</section>			
+		<button onclick="startGame();">Random</button>
+		<div>吐捲七言詩</div>
+		<section id="sevenTable">	
 		</section>			
 	</div>
 	
@@ -47,27 +59,68 @@ $(document).ready(function() {
 });
 
 function startGame() {
-	var cardsHtml = "<table>";
+	var threeTableHtml = "<table>";
 	for(var i=0 ;i<4 ; i++) {
-		cardsHtml = cardsHtml + "<tr>";
+		threeTableHtml = threeTableHtml + "<tr>";
 		for(var j=0 ;j<6 ; j++) {
 			if(i==0) {
 				var sn = j+1;
-				cardsHtml = cardsHtml + "<th>"+sn+"</th>";
+				threeTableHtml = threeTableHtml + "<th>"+sn+"</th>";
 			} else {
 				let randomNum = Math.random() < 0.5 ? 1 : 2;
 				var imageName = "andy-"+randomNum+".png"
-				cardsHtml = cardsHtml + "<td><img src='../sor-game/image/33/"+ imageName +"'/></td>";
+				threeTableHtml = threeTableHtml + "<td><img src='../sor-game/image/33/"+ imageName +"'/></td>";
 			}
 		
 		}
-		cardsHtml = cardsHtml + "</tr>";
+		threeTableHtml = threeTableHtml + "</tr>";
 	}
+	threeTableHtml = threeTableHtml + "</table>";
+	$("#threeTable").html(threeTableHtml);		
 
 
+	var fiveTableHtml = "<table>";
+	for(var i=0 ;i<4 ; i++) {
+		fiveTableHtml = fiveTableHtml + "<tr>";
+		for(var j=0 ;j<7 ; j++) {
+			if(j==0) {
+				var sn = i+1;
+				fiveTableHtml = fiveTableHtml + "<th>"+sn+"</th>";
+			} else if (j==3) {
+				fiveTableHtml = fiveTableHtml + "<td style='width:30px'></td>";
+			} else {
+				let randomNum = Math.random() < 0.5 ? 1 : 2;
+				var imageName = "andy-"+randomNum+".png"
+				fiveTableHtml = fiveTableHtml + "<td><img src='../sor-game/image/33/"+ imageName +"'/></td>";
+			}
+		
+		}
+		fiveTableHtml = fiveTableHtml + "</tr>";
+	}
+	fiveTableHtml = fiveTableHtml + "</table>";
+	$("#fiveTable").html(fiveTableHtml);		
 
-	cardsHtml = cardsHtml + "</table>";
-	$("#threeTable").html(cardsHtml);		
+	var sevenTableHtml = "<table>";
+	for(var i=0 ;i<4 ; i++) {
+		sevenTableHtml = sevenTableHtml + "<tr>";
+		for(var j=0 ;j<10 ; j++) {
+			if(j==0) {
+				var sn = i+1;
+				sevenTableHtml = sevenTableHtml + "<th>"+sn+"</th>";
+			} else if (j==3) {
+				sevenTableHtml = sevenTableHtml + "<td style='width:30px'></td>";
+			}else if (j==6) {
+				sevenTableHtml = sevenTableHtml + "<td style='width:30px'></td>";
+			} else {
+				let randomNum = Math.random() < 0.5 ? 1 : 2;
+				var imageName = "andy-"+randomNum+".png"
+				sevenTableHtml = sevenTableHtml + "<td><img src='../sor-game/image/33/"+ imageName +"'/></td>";
+			}
+		}
+		sevenTableHtml = sevenTableHtml + "</tr>";
+	}
+	sevenTableHtml = sevenTableHtml + "</table>";
+	$("#sevenTable").html(sevenTableHtml);
 }
 
 
